@@ -180,8 +180,14 @@ if __name__ == "__main__":
         out['SNIP'].append(class_snip)
 
     df = pandas.DataFrame(data = out)
-    df.to_excel("output.xlsx")
-
 
     print("")
+    if os.path.exists('output.xlsx'):
+      print("Il file output.xlsx esiste già, sovrascriverlo? [yn] ", end = '')
+      ans = input()
+
+      if ans.lower() == 'n':
+        sys.exit(0)
+
+    df.to_excel("output.xlsx")
     print("> I dati sono stati salvati in output.xlsx")
