@@ -18,12 +18,12 @@ def get_scopus_citations(id):
         return (0, 0)
 
         
-def get_journals_classification(year, sector, folder):
+def get_journals_classification(year, sector, folder, sheet):
     db_dir = os.path.join(journal_path, str(year), "Lista %s" % folder)
     for f in os.listdir(db_dir):
         if sector in f:
             # We have found the right file
-            d = pandas.read_excel(os.path.join(db_dir, f))
+            d = pandas.read_excel(os.path.join(db_dir, f), sheet_name = sheet)
 
             # We build a hash table that maps the lower case name of the 
             # journal to an array of the number of citations required to 
@@ -64,6 +64,14 @@ def truncate(x, n):
         return x[0:n-4] + "..."
     else:
         return x.ljust(n-1)
+
+def format_class(C):
+  if C == "A":
+    return "\033[32;1mA\033[0m"
+  elif C == "B":
+    return "\033[33;1mB\033[0m"
+  else:
+    return C
     
 
 if __name__ == "__main__":
@@ -84,12 +92,12 @@ if __name__ == "__main__":
     years = [ 2015, 2016, 2017, 2018, 2019 ]
 
     class_names = [
-        "==========",
-        "\033[32;1mTop 10%   \033[0m",
-        "\033[33;1m10% - 35% \033[0m",
-        "35% - 60% ",
-        "60% - 80% ",
-        "Bottom 20%",
+        "X",
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
     ]
 
     print("Inserire il settore (e.g, MAT01, ..., MAT08): ", end = "")
@@ -97,19 +105,37 @@ if __name__ == "__main__":
 
 
 
-    db = { year: db for (year, db) in zip(
+    db_mcq = { year: db for (year, db) in zip(
         years, 
-        map(lambda x : get_journals_classification(x, sector, "MCQ-SCOPUS"), years)
+        map(lambda x : get_journals_classification(x, sector, "MCQ-SCOPUS", "article_MCQ"), years)
     ) }
 
-    db2 = { year: db for (year, db) in zip(
+    db_sjr = { year: db for (year, db) in zip(
         years, 
-        map(lambda x : get_journals_classification(x, sector, "SJR-SNIP"), years)
+        map(lambda x : get_journals_classification(x, sector, "SJR-SNIP", "article_SJR"), years)
+    ) }
+
+    db_snip = { year: db for (year, db) in zip(
+        years, 
+        map(lambda x : get_journals_classification(x, sector, "SJR-SNIP", "article_SNIP"), years)
     ) }
 
     data = pandas.read_excel(sys.argv[1])
 
-    print("\033[1mMCQ-SCOPUS  SJR-SNIP    Titolo                                   Anno  #cit. #autocit. Rivista                  Autori \033[0m")
+    # We prepare the data for the output
+    out = {
+      'Titolo': [], 
+      'MCQ': [],
+      'SJR': [],
+      'SNIP': [],
+      'Anno': [],
+      'Rivista': [],
+      '# citazioni': [],
+      '# autocitazioni': [],
+      'Autori': []
+    }
+
+    print("\033[1mMCQ SJR SNIP Titolo                                   Anno  #cit. #autocit. Rivista                  Autori \033[0m")
 
     for j in range(len(data)):
         scopus_id = data["Identificativo Scopus"][j]
@@ -123,16 +149,39 @@ if __name__ == "__main__":
             journal = journal.lower()
 
         (cit, self_cit) = get_scopus_citations(scopus_id)
-        cl = get_classification(journal, cit, db[year])
-        cl2 = get_classification(journal, cit, db2[year])
+        cl_mcq = get_classification(journal, cit, db_mcq[year])
+        cl_sjr = get_classification(journal, cit, db_sjr[year])
+        cl_snip = get_classification(journal, cit, db_snip[year])
 
         # Se le autocitazioni superano il 50% formattiamo in rosso
         if self_cit >= cit / 2:
-          self_cit = "\033[31;1m" + str(self_cit).rjust(8) + "\033[0m"
+          self_cit_s = "\033[31;1m" + str(self_cit).rjust(8) + "\033[0m"
         else:
-          self_cit = str(self_cit).rjust(8)
+          self_cit_s = str(self_cit).rjust(8)
 
-        print("%s  %s  %s  %s  %s  %s  %s  %s" % (class_names[cl+1], class_names[cl2+1], 
-            truncate(data["Titolo"][j], 40), year, str(cit).rjust(4), self_cit, 
-            truncate(journal, 24), data['Autori'][j])
+        class_mcq = class_names[cl_mcq+1]
+        class_sjr = class_names[cl_sjr+1]
+        class_snip = class_names[cl_snip+1]
+
+        print("%s   %s   %s    %s  %s  %s  %s  %s  %s" % (
+          format_class(class_mcq), format_class(class_sjr), format_class(class_snip),
+          truncate(data["Titolo"][j], 40), year, str(cit).rjust(4), self_cit_s, 
+          truncate(journal, 24), data['Autori'][j])
         )
+
+        out['Titolo'].append(data["Titolo"][j])
+        out['Anno'].append(year)
+        out['# citazioni'].append(cit)
+        out['# autocitazioni'].append(self_cit)
+        out['Rivista'].append(journal)
+        out['Autori'].append(data['Autori'][j])
+        out['MCQ'].append(class_mcq)
+        out['SJR'].append(class_sjr)
+        out['SNIP'].append(class_snip)
+
+    df = pandas.DataFrame(data = out)
+    df.to_excel("output.xlsx")
+
+
+    print("")
+    print("> I dati sono stati salvati in output.xlsx")
