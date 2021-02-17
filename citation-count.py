@@ -127,7 +127,7 @@ if __name__ == "__main__":
         cl2 = get_classification(journal, cit, db2[year])
 
         # Se le autocitazioni superano il 50% formattiamo in rosso
-        if self_cit > cit / 2:
+        if self_cit >= cit / 2:
           self_cit = "\033[31;1m" + str(self_cit).rjust(8) + "\033[0m"
         else:
           self_cit = str(self_cit).rjust(8)
