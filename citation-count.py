@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     data = pandas.read_excel(sys.argv[1])
 
-    print("\033[1mMCQ-SCOPUS  SJR-SNIP    Titolo                                   Anno  # cit. Rivista                  Autori \033[0m")
+    print("\033[1mMCQ-SCOPUS  SJR-SNIP    Titolo                                   Anno  #cit. #autocit. Rivista                  Autori \033[0m")
 
     for j in range(len(data)):
         scopus_id = data["Identificativo Scopus"][j]
@@ -126,7 +126,13 @@ if __name__ == "__main__":
         cl = get_classification(journal, cit, db[year])
         cl2 = get_classification(journal, cit, db2[year])
 
-        print("%s  %s  %s  %s  %s  %s  %s" % (class_names[cl+1], class_names[cl2+1], 
-            truncate(data["Titolo"][j], 40), year, str(cit).ljust(5), 
+        # Se le autocitazioni superano il 50% formattiamo in rosso
+        if self_cit > cit / 2:
+          self_cit = "\033[31;1m" + str(self_cit).rjust(8) + "\033[0m"
+        else:
+          self_cit = str(self_cit).rjust(8)
+
+        print("%s  %s  %s  %s  %s  %s  %s  %s" % (class_names[cl+1], class_names[cl2+1], 
+            truncate(data["Titolo"][j], 40), year, str(cit).rjust(4), self_cit, 
             truncate(journal, 24), data['Autori'][j])
         )
