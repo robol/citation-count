@@ -17,6 +17,10 @@ class App extends React.Component {
     };
   }
 
+  componentDidMount() {
+    document.title = "Classificazione VQR 2015 &mdash; 2019";
+  }
+
   onClassification(cl) {
     this.setState({
       "currentClassification": cl

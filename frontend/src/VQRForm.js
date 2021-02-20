@@ -38,16 +38,26 @@ class VQRForm extends React.Component {
 
   async computeClassification() {
 
-    // Check data; FIXME: We should handle errors here
-    if (this.state["year"].length !== 1) {
-      return;
+    var errors = [];
+    const valid_years = [ "2015", "2016", "2017", "2018", "2019" ];
+    const valid_sectors = [ "MAT01", "MAT02", "MAT03", "MAT05", "MAT06", "MAT07", "MAT08" ];
+
+    if (this.state["year"].length !== 1 || !valid_years.includes(this.state["year"][0])) {
+      errors.push("Selezionare un anno valido.");
     }
 
-    if (this.state["sector"].length !== 1) {
-      return;
+    if (this.state["sector"].length !== 1 || !valid_sectors.includes(this.state["sector"][0])) {
+      errors.push("Inserire un settore valido.")
     }
 
     if (this.state["journal"].length !== 1) {
+      errors.push("Selezionare una valida rivista.");
+    }
+
+    if (errors.length > 0) {
+      this.props.onClassification({
+        "errors": errors
+      });
       return;
     }
     
@@ -66,12 +76,20 @@ class VQRForm extends React.Component {
       body: JSON.stringify(data)
     })
 
-    const response = await res.json();
-
-    this.props.onClassification({
-      "input": data,
-      "response": response
-    });
+    if (res.status === 200) {
+      const response = await res.json();
+      this.props.onClassification({
+        "input": data,
+        "response": response
+      });
+    }
+    else {
+      this.props.onClassification({
+        "errors": [
+          "Impossibile interrogare il servizio; controllare gli input, o riprovare più tardi"
+        ]
+      });
+    }
   }
 
   render() {
