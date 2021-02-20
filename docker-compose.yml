@@ -1,0 +1,17 @@
+version: '2.1'
+
+services:
+  vqr:
+    image: robol/vqr
+    networks:
+      - default
+
+  vqr-frontend:
+    image: robol/vqr-frontend
+    networks:
+      - default
+    ports:
+      - 80:80
+
+networks:
+  default:
