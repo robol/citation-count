@@ -12,18 +12,18 @@ class ClassificationData extends React.Component {
     }
     else if (this.props.classification["errors"] !== undefined) {
       const errors = this.props.classification["errors"];
-      const error_list = errors.map((v) => {
+      const error_list = errors.map((v, idx) => {
         return (
-          <li>{v}</li>
+          <li key={idx}>{v}</li>
         );
       });
 
       return (
         <Alert variant="danger" className="mt-4">
-          <p>Sono stati incontrati degli errori:
+          <p>Sono stati incontrati degli errori:</p>
           <ul>
             {error_list}
-          </ul></p>
+          </ul>
         </Alert>
       );
     }

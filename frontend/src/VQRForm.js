@@ -12,6 +12,8 @@ class VQRForm extends React.Component {
 
     this.citations_ref = React.createRef();
     this.journal_ref = React.createRef();
+    this.year_ref = React.createRef();
+    this.sector_ref = React.createRef();
 
     this.state = {
       "sector": [],
@@ -42,16 +44,25 @@ class VQRForm extends React.Component {
     const valid_years = [ "2015", "2016", "2017", "2018", "2019" ];
     const valid_sectors = [ "MAT01", "MAT02", "MAT03", "MAT05", "MAT06", "MAT07", "MAT08" ];
 
-    if (this.state["year"].length !== 1 || !valid_years.includes(this.state["year"][0])) {
+    const year = this.year_ref.current.state.text;
+    const sector = this.sector_ref.current.state.text;
+    const journal = this.journal_ref.current.state.text;
+    const citations = parseInt(this.citations_ref.current.value);
+
+    if (! valid_years.includes(year)) {
       errors.push("Selezionare un anno valido.");
     }
 
-    if (this.state["sector"].length !== 1 || !valid_sectors.includes(this.state["sector"][0])) {
+    if (! valid_sectors.includes(sector)) {
       errors.push("Inserire un settore valido.")
     }
 
-    if (this.state["journal"].length !== 1) {
-      errors.push("Selezionare una valida rivista.");
+    if (! this.journal_list.includes(journal)) {
+      errors.push("Selezionare una valida rivista, inclusa nelle liste del GEV.");
+    }
+
+    if (isNaN(citations) || citations < 0) {
+      errors.push("Inserire un valido numero di citazioni.");
     }
 
     if (errors.length > 0) {
@@ -62,10 +73,10 @@ class VQRForm extends React.Component {
     }
     
     const data = {
-      "journal": this.state["journal"][0],
-      "citations": parseInt(this.citations_ref.current.value),
-      "year": parseInt(this.state["year"][0]),
-      "sector": this.state["sector"][0]
+      "journal": journal,
+      "citations": citations,
+      "year": parseInt(year),
+      "sector": sector
     };
 
     const res = await fetch(api_base + 'classify', {
@@ -121,7 +132,7 @@ class VQRForm extends React.Component {
         <Form.Group controlId="formYear">
           <Form.Label>Anno</Form.Label>
           <Typeahead 
-            onChange={(selected) => this.setState({'year': selected})}
+            ref={this.year_ref}
             id="year" 
             options={[ '2015', '2016', '2017', '2018', '2019' ]}
           >
@@ -142,7 +153,7 @@ class VQRForm extends React.Component {
         <Form.Group controlId="formSector">
           <Form.Label>Settore</Form.Label>
           <Typeahead 
-            onChange={(selected) => this.setState({'sector': selected})}
+            ref={this.sector_ref}
             id="sector" 
             options={[ 'MAT01', 'MAT02', 'MAT03', 'MAT05', 'MAT06', 'MAT07', 'MAT08' ]}
           >
