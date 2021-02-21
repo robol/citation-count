@@ -1,6 +1,6 @@
 import requests, json, pandas, os, sys
 
-journal_path = "./scopus"
+journal_path = "./"
 
 # Some names are wrong in the GEV list, I am keeping this here to fix any inconsistency 
 # that should arise. 
@@ -18,8 +18,8 @@ def get_scopus_citations(id):
         return (0, 0)
 
         
-def get_journals_classification(year, sector, folder, sheet):
-    db_dir = os.path.join(journal_path, str(year), "Lista %s" % folder)
+def get_journals_classification(year, db, sector, folder, sheet):
+    db_dir = os.path.join(journal_path, str(db), str(year), "Lista %s" % folder)
     for f in os.listdir(db_dir):
         if sector in f:
             # We have found the right file
@@ -30,7 +30,11 @@ def get_journals_classification(year, sector, folder, sheet):
             # be in the various categories
             dd = {}
             for j in range(len(d)):
-                name = str(d["Source Title"][j]).lower()
+                if db == "scopus":
+                  name = str(d["Source Title"][j]).lower()
+                else:
+                  name = str(d["Journal"][j]).lower()
+
                 for pair in name_replacements:
                     name = name.replace(pair[0], pair[1])
 

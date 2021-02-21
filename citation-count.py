@@ -32,17 +32,17 @@ if __name__ == "__main__":
 
     db_mcq = { year: db for (year, db) in zip(
         years, 
-        map(lambda x : get_journals_classification(x, sector, "MCQ-SCOPUS", "article_MCQ"), years)
+        map(lambda x : get_journals_classification(x, "scopus", sector, "MCQ-SCOPUS", "article_MCQ"), years)
     ) }
 
     db_sjr = { year: db for (year, db) in zip(
         years, 
-        map(lambda x : get_journals_classification(x, sector, "SJR-SNIP", "article_SJR"), years)
+        map(lambda x : get_journals_classification(x, "scopus", sector, "SJR-SNIP", "article_SJR"), years)
     ) }
 
     db_snip = { year: db for (year, db) in zip(
         years, 
-        map(lambda x : get_journals_classification(x, sector, "SJR-SNIP", "article_SNIP"), years)
+        map(lambda x : get_journals_classification(x, "scopus", sector, "SJR-SNIP", "article_SNIP"), years)
     ) }
 
     data = pandas.read_excel(sys.argv[1])

@@ -36,17 +36,21 @@ class ClassificationData extends React.Component {
           <strong>Rivista</strong>: <span style={{ "textTransform": "capitalize" }}>{input["journal"]}</span><br />
           <strong>Anno</strong>: {input["year"]} <br />
           <strong>Settore</strong>: {input["sector"]} <br />
-          <strong>Citazioni</strong>: {input["citations"]} <br /><br />
+          <strong>Citazioni su SCOPUS</strong>: {input["scopus-citations"]} <br />
+          <strong>Citazioni su WOS</strong>: {input["wos-citations"]} <br /><br />
 
           <Row>
             <Col>
-              <ClassificationCard name="MCQ" classification={ response["mcq"] }></ClassificationCard>
+              <ClassificationCard name="MCQ-SCOPUS" classification={ response["mcq"] }></ClassificationCard>
             </Col>
             <Col>
-              <ClassificationCard name="SJR" classification={ response["sjr"] }></ClassificationCard>
+              <ClassificationCard name="SJR-SCOPUS" classification={ response["sjr"] }></ClassificationCard>
             </Col>
             <Col>
               <ClassificationCard name="SNIP" classification={ response["snip"] }></ClassificationCard>
+            </Col>
+            <Col>
+              <ClassificationCard name="MCQ-WOS" classification={ response["mcq-wos"] }></ClassificationCard>
             </Col>
           </Row>
         </Alert>

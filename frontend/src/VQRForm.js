@@ -10,7 +10,8 @@ class VQRForm extends React.Component {
     super(props);
     this.computeClassification = this.computeClassification.bind(this);
 
-    this.citations_ref = React.createRef();
+    this.scopus_citations_ref = React.createRef();
+    this.wos_citations_ref = React.createRef();
     this.journal_ref = React.createRef();
     this.year_ref = React.createRef();
     this.sector_ref = React.createRef();
@@ -47,7 +48,8 @@ class VQRForm extends React.Component {
     const year = this.year_ref.current.state.text;
     const sector = this.sector_ref.current.state.text;
     const journal = this.journal_ref.current.state.text;
-    const citations = parseInt(this.citations_ref.current.value);
+    const scopus_citations = parseInt(this.scopus_citations_ref.current.value);
+    const wos_citations = parseInt(this.wos_citations_ref.current.value);
 
     if (! valid_years.includes(year)) {
       errors.push("Selezionare un anno valido.");
@@ -61,8 +63,12 @@ class VQRForm extends React.Component {
       errors.push("Selezionare una valida rivista, inclusa nelle liste del GEV.");
     }
 
-    if (isNaN(citations) || citations < 0) {
-      errors.push("Inserire un valido numero di citazioni.");
+    if (isNaN(scopus_citations) || scopus_citations < 0) {
+      errors.push("Inserire un valido numero di citazioni su SCOPUS.");
+    }
+
+    if (isNaN(wos_citations) || wos_citations < 0) {
+      errors.push("Inserire un valido numero di citazioni su WOS.");
     }
 
     if (errors.length > 0) {
@@ -74,7 +80,8 @@ class VQRForm extends React.Component {
     
     const data = {
       "journal": journal,
-      "citations": citations,
+      "scopus-citations": scopus_citations,
+      "wos-citations": wos_citations,
       "year": parseInt(year),
       "sector": sector
     };
@@ -142,9 +149,17 @@ class VQRForm extends React.Component {
           </Form.Text>
         </Form.Group>
 
+        <Form.Group controlId="formScopusCitations">
+          <Form.Label>Numero di citazioni su Scopus</Form.Label>
+          <Form.Control ref={this.scopus_citations_ref} type="text" label="Numero di citazioni su SCOPUS" />
+          <Form.Text className="text-muted">
+            Inserire un intero positivo.
+          </Form.Text>
+        </Form.Group>
+
         <Form.Group controlId="formCitations">
-          <Form.Label>Numero di citazioni</Form.Label>
-          <Form.Control ref={this.citations_ref} type="text" label="Numero di citazioni" />
+          <Form.Label>Numero di citazioni su WOS</Form.Label>
+          <Form.Control ref={this.wos_citations_ref} type="text" label="Numero di citazioni su WOS" />
           <Form.Text className="text-muted">
             Inserire un intero positivo.
           </Form.Text>

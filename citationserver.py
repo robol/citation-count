@@ -29,18 +29,27 @@ sectors = [
 
 classifications = {
    "mcq": {
+     "db": "scopus",
      "folder": "MCQ-SCOPUS",
      "sheet": "article_MCQ"
    }, 
 
    "sjr": {
+     "db": "scopus",
      "folder": "SJR-SNIP",
      "sheet": "article_SJR"
    },
 
    "snip": {
+     "db": "scopus",
      "folder": "SJR-SNIP",
      "sheet": "article_SNIP"
+   },
+
+   "mcq-wos": {
+     "db": "wos",
+     "folder": "MCQ-WOS",
+     "sheet": "article_MCQ"
    }
 }
 
@@ -53,7 +62,7 @@ for sector in sectors:
     print("Loading %s / %s ..." % (sector, cl), end = '')
     sectors_db[sector][cl] = { year: db for (year, db) in zip(
         years, 
-        map(lambda x : cit.get_journals_classification(x, sector, classification["folder"], classification["sheet"]), years)
+        map(lambda x : cit.get_journals_classification(x, classification["db"], sector, classification["folder"], classification["sheet"]), years)
     ) }  
     print(" done.")
 
@@ -92,18 +101,21 @@ def classify():
   d = json.loads(request.data)
 
   journal = d["journal"].lower()
-  citations = d["citations"]
+  scopus_citations = d["scopus-citations"]
+  wos_citations = d["wos-citations"]
   year = d["year"]
   sector = d["sector"]
 
-  cl_mcq = cit.get_classification(journal, citations, sectors_db[sector]["mcq"][year])
-  cl_sjr = cit.get_classification(journal, citations, sectors_db[sector]["sjr"][year])
-  cl_snip = cit.get_classification(journal, citations, sectors_db[sector]["snip"][year])
+  cl_mcq = cit.get_classification(journal, scopus_citations, sectors_db[sector]["mcq"][year])
+  cl_sjr = cit.get_classification(journal, scopus_citations, sectors_db[sector]["sjr"][year])
+  cl_snip = cit.get_classification(journal, scopus_citations, sectors_db[sector]["snip"][year])
+  cl_wos = cit.get_classification(journal, wos_citations, sectors_db[sector]["mcq-wos"][year])
 
   return json.dumps({
     "mcq": class_names[cl_mcq+1],
     "sjr": class_names[cl_sjr+1],
-    "snip": class_names[cl_snip+1]
+    "snip": class_names[cl_snip+1],
+    "mcq-wos": class_names[cl_wos+1]
   })
 
 
