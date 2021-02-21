@@ -6,6 +6,7 @@ RUN apt-get update && \
 
 COPY citationserver.py citations.py /app/
 COPY scopus /app/scopus
+COPY wos /app/wos
 
 WORKDIR /app
 
