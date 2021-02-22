@@ -8,9 +8,13 @@ flaskpid="$!"
 cd frontend && npm start &
 nodepid="$!"
 
+function shutdown_servers {
+  kill ${nodepid}
+  kill ${flaskpid}
+}
+
+trap shutdown_servers INT
+
 wait
 
-kill ${nodepid}
-kill ${flaskpid}
 
-killall flask
