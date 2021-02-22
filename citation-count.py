@@ -45,6 +45,11 @@ if __name__ == "__main__":
         map(lambda x : get_journals_classification(x, "scopus", sector, "SJR-SNIP", "article_SNIP"), years)
     ) }
 
+    db_wos = { year: db for (year, db) in zip(
+        years, 
+        map(lambda x : get_journals_classification(x, "wos", sector, "MCQ-WOS", "article_MCQ"), years)
+    ) }
+
     data = pandas.read_excel(sys.argv[1])
 
     # We prepare the data for the output
@@ -60,10 +65,11 @@ if __name__ == "__main__":
       'Autori': []
     }
 
-    print("\033[1mMCQ SJR SNIP Titolo                                   Anno  #cit. #autocit. Rivista                  Autori \033[0m")
+    print("\033[1mMCQ SJR SNIP WOS Titolo                                   Anno  #cit. #autocit. #cit.WOS Rivista                  Autori \033[0m")
 
     for j in range(len(data)):
         scopus_id = data["Identificativo Scopus"][j]
+        wos_id = data["Identificativo WOS"][j]
         year = data["Data pubblicazione"][j]
 
         journal = data["Rivista"][j]
@@ -74,9 +80,11 @@ if __name__ == "__main__":
             journal = journal.lower()
 
         (cit, self_cit) = get_scopus_citations(scopus_id)
+        (cit_wos, self_cit_wos) = get_wos_citations(wos_id)
         cl_mcq = get_classification(journal, cit, db_mcq[year])
         cl_sjr = get_classification(journal, cit, db_sjr[year])
         cl_snip = get_classification(journal, cit, db_snip[year])
+        cl_wos = get_classification(journal, cit_wos, db_wos[year])
 
         # Se le autocitazioni superano il 50% formattiamo in rosso
         if self_cit >= cit / 2:
@@ -84,13 +92,21 @@ if __name__ == "__main__":
         else:
           self_cit_s = str(self_cit).rjust(8)
 
+        if self_cit_wos >= cit_wos / 2:
+          self_cit_s_wos = "\033[31;1m" + str(self_cit_wos).rjust(8) + "\033[0m"
+        else:
+          self_cit_s_wos = str(self_cit_wos).rjust(8)          
+
         class_mcq = class_names[cl_mcq+1]
         class_sjr = class_names[cl_sjr+1]
         class_snip = class_names[cl_snip+1]
+        class_wos = class_names[cl_wos+1]
 
-        print("%s   %s   %s    %s  %s  %s  %s  %s  %s" % (
+        print("%s   %s   %s    %s   %s  %s  %s  %s  %s %s  %s" % (
           format_class(class_mcq), format_class(class_sjr), format_class(class_snip),
+          format_class(class_wos), 
           truncate(data["Titolo"][j], 40), year, str(cit).rjust(4), self_cit_s, 
+          str(cit_wos).rjust(8), 
           truncate(journal, 24), data['Autori'][j])
         )
 

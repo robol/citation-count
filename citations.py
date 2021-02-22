@@ -21,6 +21,21 @@ def get_scopus_citations(id):
     except:
         return (0, 0)
 
+def get_wos_citations(id):
+    req = requests.get("https://arpi.unipi.it/sur/itemExternalCitation/isi/get.json?externalId=%s" % id)
+
+    try:
+        data = json.loads(req.text)
+        res = (data["citationCountTotal"], 0)
+        if res[0] is None:
+          res[0] = 0
+        if res[1] is None:
+          res[1] = 0
+        
+        return res
+    except:
+        return (0, 0)
+
         
 def get_journals_classification(year, db, sector, folder, sheet):
     db_dir = os.path.join(journal_path, str(db), str(year), "Lista %s" % folder)
