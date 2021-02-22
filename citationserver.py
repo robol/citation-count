@@ -103,8 +103,8 @@ def classify():
   journal = d["journal"].lower()
   scopus_citations = d["scopus-citations"]
   wos_citations = d["wos-citations"]
-  year = d["year"]
-  sector = d["sector"]
+  year = int(d["year"])
+  sector = d["sector"].replace("/", "")
 
   cl_mcq = cit.get_classification(journal, scopus_citations, sectors_db[sector]["mcq"][year])
   cl_sjr = cit.get_classification(journal, scopus_citations, sectors_db[sector]["sjr"][year])

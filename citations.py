@@ -13,7 +13,11 @@ def get_scopus_citations(id):
 
     try:
         data = json.loads(req.text)
-        return (data["citationCountTotal"], data["selfCitationCountTotal"])
+        res = (data["citationCountTotal"], data["selfCitationCountTotal"])
+        if None in res:
+            return (0, 0)
+        else:
+            return res
     except:
         return (0, 0)
 
