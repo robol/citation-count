@@ -13,4 +13,4 @@ wait
 kill ${nodepid}
 kill ${flaskpid}
 
-
+killall flask

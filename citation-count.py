@@ -127,7 +127,7 @@ if __name__ == "__main__":
       print("Il file output.xlsx esiste già, sovrascriverlo? [yn] ", end = '')
       ans = input()
 
-      if ans.lower() == 'n':
+      if ans.lower() != 'y':
         sys.exit(0)
 
     df.to_excel("output.xlsx")
