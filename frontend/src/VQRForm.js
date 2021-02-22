@@ -153,7 +153,7 @@ class VQRForm extends React.Component {
           <Form.Label>Numero di citazioni su Scopus</Form.Label>
           <Form.Control ref={this.scopus_citations_ref} type="text" label="Numero di citazioni su SCOPUS" />
           <Form.Text className="text-muted">
-            Inserire un intero positivo.
+            Inserire un intero non negativo.
           </Form.Text>
         </Form.Group>
 
@@ -161,7 +161,7 @@ class VQRForm extends React.Component {
           <Form.Label>Numero di citazioni su WOS</Form.Label>
           <Form.Control ref={this.wos_citations_ref} type="text" label="Numero di citazioni su WOS" />
           <Form.Text className="text-muted">
-            Inserire un intero positivo.
+            Inserire un intero non negativo.
           </Form.Text>
         </Form.Group>
 
