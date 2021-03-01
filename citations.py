@@ -80,7 +80,7 @@ def get_classification(journal, citations, db):
         if not ("NO" in jdata[j]) and citations >= int(jdata[j]):
             return j
         
-    return len(jdata)
+    return len(jdata) - 1
 
 def find_journals(db, name):
   return filter(lambda key : name.lower() in key, db.keys())
